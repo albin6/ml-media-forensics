@@ -1,0 +1,15 @@
+{
+    "pythonVersion": "3.11",
+    "typeCheckingMode": "basic",
+    "pythonPlatform": "Linux",
+    "venvPath": ".",
+    "venv": ".venv",
+    "reportMissingModuleSource": "none",
+    "reportMissingImports": "warning",
+    "useLibraryCodeForTypes": true,
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/.*"
+    ]
+}

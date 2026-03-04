@@ -1,0 +1,32 @@
+{
+  "active_image_model": "xception_v1.0.0",
+  "active_video_model": "cnn_lstm_v1.0.0",
+  "versions": {
+    "xception_v1.0.0": {
+      "file": "v1/xception_forensic.pt",
+      "architecture": "XceptionNet",
+      "trained_on": "FaceForensics++",
+      "description": "XceptionNet fine-tuned on FaceForensics++ for image splicing detection",
+      "f1_score": null,
+      "registered_at": "2026-03-04T00:00:00Z",
+      "note": "Weights file placeholder — replace with trained model before deployment"
+    },
+    "resnet50_v1.0.0": {
+      "file": "v1/resnet50_casia.pt",
+      "architecture": "ResNet50",
+      "trained_on": "CASIA v2",
+      "description": "ResNet-50 fine-tuned on CASIA for copy-move and splicing",
+      "f1_score": null,
+      "registered_at": "2026-03-04T00:00:00Z"
+    },
+    "cnn_lstm_v1.0.0": {
+      "file": "v1/cnn_lstm_video.pt",
+      "architecture": "CNN+LSTM",
+      "trained_on": "FaceForensics++ video",
+      "description": "ResNet-50 CNN encoder + LSTM temporal analyser for video forgery",
+      "f1_score": null,
+      "registered_at": "2026-03-04T00:00:00Z",
+      "note": "Weights file placeholder — replace with trained model before deployment"
+    }
+  }
+}
