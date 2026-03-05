@@ -22,14 +22,12 @@ storage = StorageService()
 IMAGE_TYPES = set(settings.ALLOWED_IMAGE_TYPES.split(","))
 VIDEO_TYPES = set(settings.ALLOWED_VIDEO_TYPES.split(","))
 
-
 def _detect_media_type(mime: str) -> MediaType:
     if mime in IMAGE_TYPES:
         return MediaType.image
     if mime in VIDEO_TYPES:
         return MediaType.video
     raise HTTPException(status_code=415, detail=f"Unsupported media type: {mime}")
-
 
 @router.post("/upload", response_model=EvidenceResponse, status_code=status.HTTP_201_CREATED)
 async def upload_evidence(
@@ -38,31 +36,25 @@ async def upload_evidence(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_analyst),
 ):
-    # ── Read file bytes ───────────────────────────────────────────────────────
     file_bytes: bytes = bytes(await file.read())
     file_size  = len(file_bytes)
 
-    # ── MIME validation via libmagic (not just Content-Type header) ───────────
-    header_sample: bytes = file_bytes[:2048]  # type: ignore[index]  # Pyre2 bug: bytes IS sliceable
+    header_sample: bytes = file_bytes[:2048]
     detected_mime = magic.from_buffer(header_sample, mime=True)
     if detected_mime not in settings.allowed_mime_types:
         raise HTTPException(status_code=415, detail=f"File type not permitted: {detected_mime}")
 
     media_type = _detect_media_type(detected_mime)
 
-    # ── Size limits ───────────────────────────────────────────────────────────
     max_size = settings.max_image_bytes if media_type == MediaType.image else settings.max_video_bytes
     if file_size > max_size:
         raise HTTPException(status_code=413, detail="File exceeds maximum allowed size")
 
-    # ── Forensic SHA-256 hash ─────────────────────────────────────────────────
     sha256 = compute_sha256(file_bytes)
     logger.info("evidence_upload", user_id=str(current_user.id), sha256=sha256, size=file_size)
 
-    # ── UUID-based storage key (never derived from original filename) ─────────
     storage_key = f"evidence/{uuid.uuid4()}/{uuid.uuid4()}.bin"
 
-    # ── Upload to MinIO ───────────────────────────────────────────────────────
     storage.upload(
         bucket=settings.MINIO_EVIDENCE_BUCKET,
         key=storage_key,
@@ -71,7 +63,6 @@ async def upload_evidence(
         content_type=detected_mime,
     )
 
-    # ── Persist evidence record ───────────────────────────────────────────────
     evidence = Evidence(
         uploaded_by=current_user.id,
         filename=file.filename or "unknown",
@@ -86,7 +77,6 @@ async def upload_evidence(
     db.add(evidence)
     await db.flush()
 
-    # ── Audit log ─────────────────────────────────────────────────────────────
     db.add(AuditLog(
         user_id=current_user.id,
         event_type=AuditEventType.upload,
@@ -96,7 +86,6 @@ async def upload_evidence(
         details={"filename": file.filename, "sha256": sha256, "size": file_size},
     ))
     return evidence
-
 
 @router.get("", response_model=list[EvidenceResponse])
 async def list_evidence(
@@ -111,7 +100,6 @@ async def list_evidence(
         .offset(skip).limit(limit)
     )
     return result.scalars().all()
-
 
 @router.get("/{evidence_id}", response_model=EvidenceResponse)
 async def get_evidence(
@@ -129,7 +117,6 @@ async def get_evidence(
         raise HTTPException(status_code=403, detail="Access denied")
     return evidence
 
-
 @router.delete("/{evidence_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_evidence(
     evidence_id: uuid.UUID,
@@ -140,4 +127,4 @@ async def delete_evidence(
     evidence = result.scalar_one_or_none()
     if not evidence:
         raise HTTPException(status_code=404, detail="Evidence not found")
-    evidence.is_deleted = True  # Soft-delete only
+    evidence.is_deleted = True

@@ -88,7 +88,7 @@ export default function DashboardPage() {
 
     return (
         <div style={{ minHeight: "100vh", display: "flex" }}>
-            {/* Sidebar */}
+            
             <aside style={{
                 width: 240, background: "var(--bg-surface)",
                 borderRight: "1px solid var(--border)",
@@ -124,10 +124,10 @@ export default function DashboardPage() {
                 </button>
             </aside>
 
-            {/* Main */}
+            
             <main style={{ flex: 1, overflow: "auto" }}>
                 <div className="page-container">
-                    {/* Stats Row */}
+                    
                     <div className="grid-3" style={{ marginBottom: "2rem" }}>
                         {[
                             { label: "Total Evidence", value: stats.total, color: "var(--accent-primary)" },
@@ -141,7 +141,7 @@ export default function DashboardPage() {
                         ))}
                     </div>
 
-                    {/* Upload Zone */}
+                    
                     <div className="card" style={{ marginBottom: "2rem" }}>
                         <h2 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "1rem" }}>
                             Upload Evidence
@@ -184,7 +184,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Evidence Table */}
+                    
                     <div className="card">
                         <h2 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "1rem" }}>
                             Evidence Records

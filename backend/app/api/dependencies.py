@@ -11,7 +11,6 @@ from app.models.user import User, UserRole
 
 bearer_scheme = HTTPBearer()
 
-
 async def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
     db: AsyncSession = Depends(get_db),
@@ -37,7 +36,6 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-
 def require_role(*roles: UserRole):
     """Factory that returns a dependency enforcing one of the given roles."""
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
@@ -49,7 +47,5 @@ def require_role(*roles: UserRole):
         return current_user
     return role_checker
 
-
-# Convenience shorthands
 require_analyst = require_role(UserRole.analyst, UserRole.admin)
 require_admin   = require_role(UserRole.admin)

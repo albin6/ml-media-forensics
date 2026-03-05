@@ -12,12 +12,12 @@ celery_app.conf.update(
     result_serializer="json",
     accept_content=["json"],
     task_track_started=True,
-    task_acks_late=True,                  # Re-queue on worker crash
-    worker_prefetch_multiplier=1,         # One task at a time per worker
+    task_acks_late=True,
+    worker_prefetch_multiplier=1,
     task_routes={
         "app.tasks.image_task.*": {"queue": "image_queue"},
         "app.tasks.video_task.*": {"queue": "video_queue"},
     },
-    task_time_limit=600,                  # Hard kill after 10 min
-    task_soft_time_limit=540,             # SoftTimeLimitExceeded at 9 min
+    task_time_limit=600,
+    task_soft_time_limit=540,
 )

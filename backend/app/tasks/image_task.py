@@ -10,7 +10,6 @@ from app.services.storage_service import StorageService
 logger  = get_task_logger(__name__)
 storage = StorageService()
 
-
 def _get_sync_db():
     """Synchronous DB session for Celery tasks."""
     from sqlalchemy import create_engine
@@ -19,7 +18,6 @@ def _get_sync_db():
     engine   = create_engine(sync_url)
     Session  = sessionmaker(bind=engine)
     return Session()
-
 
 @shared_task(
     bind=True,
@@ -39,7 +37,6 @@ def run_image_analysis(self, evidence_id: str, result_id: str):
         logger.info(f"[ImageTask] Starting for evidence={evidence_id}")
         start = time.time()
 
-        # Download file from MinIO
         evidence: Evidence = db.query(Evidence).filter_by(id=uuid.UUID(evidence_id)).first()
         if not evidence:
             logger.error(f"[ImageTask] Evidence not found: {evidence_id}")
@@ -47,7 +44,6 @@ def run_image_analysis(self, evidence_id: str, result_id: str):
 
         file_bytes = storage.download_bytes(settings.MINIO_EVIDENCE_BUCKET, evidence.storage_key)
 
-        # Call ML service
         with httpx.Client(timeout=settings.ML_REQUEST_TIMEOUT_SECONDS) as client:
             resp = client.post(
                 f"{settings.ML_SERVICE_URL}/infer/image",
@@ -58,7 +54,6 @@ def run_image_analysis(self, evidence_id: str, result_id: str):
 
         elapsed = time.time() - start
 
-        # Persist heatmap to MinIO
         heatmap_key = None
         if ml_result.get("ela_heatmap_bytes"):
             import base64
@@ -66,7 +61,6 @@ def run_image_analysis(self, evidence_id: str, result_id: str):
             heatmap_key   = f"results/{result_id}/ela_heatmap.png"
             storage.upload_bytes(settings.MINIO_RESULTS_BUCKET, heatmap_key, heatmap_bytes, "image/png")
 
-        # Update DB
         analysis: AnalysisResult = db.query(AnalysisResult).filter_by(id=uuid.UUID(result_id)).first()
         analysis.is_tampered       = ml_result["is_tampered"]
         analysis.confidence_score  = ml_result["confidence"]
@@ -88,7 +82,6 @@ def run_image_analysis(self, evidence_id: str, result_id: str):
     except Exception as exc:
         db.rollback()
         logger.error(f"[ImageTask] Failed: {exc}")
-        # Mark evidence as failed
         try:
             from app.models.evidence import Evidence, EvidenceStatus
             ev = db.query(Evidence).filter_by(id=uuid.UUID(evidence_id)).first()

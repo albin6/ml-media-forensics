@@ -2,7 +2,7 @@
 import React from "react";
 
 interface ElaHeatmapProps {
-    id: string; // Analysis Result ID
+    id: string;
     filename?: string;
 }
 

@@ -36,7 +36,7 @@ export default function LoginPage() {
             padding: "2rem",
         }}>
             <div style={{ width: "100%", maxWidth: "420px" }} className="animate-in">
-                {/* Header */}
+                
                 <div style={{ textAlign: "center", marginBottom: "2rem" }}>
                     <div style={{
                         display: "inline-flex",
@@ -58,7 +58,7 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* Card */}
+                
                 <div className="card">
                     <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "1.5rem" }}>
                         Sign in to your account

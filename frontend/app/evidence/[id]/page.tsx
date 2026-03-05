@@ -55,7 +55,7 @@ export default function EvidenceDetailPage() {
 
     useEffect(() => {
         loadEvidence();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [id]);
 
     const loadEvidence = async () => {
@@ -85,7 +85,7 @@ export default function EvidenceDetailPage() {
                         setEvidence(evData);
                     }
                 } catch {
-                    // Result not ready yet
+
                 }
             }, 3000);
         } catch (err: unknown) {

@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 from PIL import Image
 
-
 def extract_frames(
     video_bytes: bytes,
     sample_rate: int = 5,
@@ -24,7 +23,6 @@ def extract_frames(
     """
     frames = []
 
-    # Write to a temp file since OpenCV VideoCapture cannot read from bytes
     with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmp:
         tmp.write(video_bytes)
         tmp.flush()

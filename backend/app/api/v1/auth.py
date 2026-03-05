@@ -19,10 +19,8 @@ from app.schemas.auth import (
 
 router = APIRouter()
 
-
 def _get_redis():
     return aioredis.from_url(settings.REDIS_URL, decode_responses=True)
-
 
 async def _log_event(db: AsyncSession, event: AuditEventType, request: Request,
                      user_id=None, details: dict = None):
@@ -34,7 +32,6 @@ async def _log_event(db: AsyncSession, event: AuditEventType, request: Request,
         details=details or {},
     )
     db.add(log)
-
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(body: RegisterRequest, request: Request, db: AsyncSession = Depends(get_db)):
@@ -48,7 +45,7 @@ async def register(body: RegisterRequest, request: Request, db: AsyncSession = D
         full_name=body.full_name,
     )
     db.add(user)
-    await db.flush()  # Get UUID before commit
+    await db.flush()
 
     await _log_event(db, AuditEventType.login, request, user.id, {"action": "register"})
 
@@ -62,7 +59,6 @@ async def register(body: RegisterRequest, request: Request, db: AsyncSession = D
         str(user.id),
     )
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
-
 
 @router.post("/login", response_model=TokenResponse)
 async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends(get_db)):
@@ -87,7 +83,6 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
     )
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
-
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
     try:
@@ -104,7 +99,6 @@ async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)
     if not stored or stored != user_id:
         raise HTTPException(status_code=401, detail="Refresh token revoked or expired")
 
-    # Rotate: delete old, issue new
     await redis.delete(f"refresh:{jti}")
 
     result = await db.execute(select(User).where(User.id == user_id, User.is_active == True))
@@ -121,7 +115,6 @@ async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)
     )
     return TokenResponse(access_token=new_access, refresh_token=new_refresh)
 
-
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(body: RefreshRequest, request: Request, db: AsyncSession = Depends(get_db)):
     try:
@@ -132,4 +125,4 @@ async def logout(body: RefreshRequest, request: Request, db: AsyncSession = Depe
         await redis.delete(f"refresh:{jti}")
         await _log_event(db, AuditEventType.logout, request, user_id)
     except Exception:
-        pass  # Always succeed on logout
+        pass

@@ -2,7 +2,6 @@ import logging
 import structlog
 from app.core.config import settings
 
-
 def configure_logging() -> None:
     log_level = logging.DEBUG if settings.APP_ENV == "development" else logging.INFO
 
@@ -20,6 +19,5 @@ def configure_logging() -> None:
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
     )
-
 
 logger = structlog.get_logger()

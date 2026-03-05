@@ -14,7 +14,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _private_key: Optional[str] = None
 _public_key: Optional[str] = None
 
-
 def _load_keys() -> tuple[str, str]:
     global _private_key, _public_key
     if not _private_key:
@@ -22,25 +21,15 @@ def _load_keys() -> tuple[str, str]:
         _public_key  = Path(settings.JWT_PUBLIC_KEY_PATH).read_text()
     return _private_key, _public_key
 
-
-# ── Password Hashing ──────────────────────────────────────────────────────────
-
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
-
 
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
-
-# ── File Hashing ──────────────────────────────────────────────────────────────
-
 def compute_sha256(data: bytes) -> str:
     """Compute SHA-256 hex digest of file bytes for forensic integrity."""
     return hashlib.sha256(data).hexdigest()
-
-
-# ── JWT Tokens ────────────────────────────────────────────────────────────────
 
 def create_access_token(user_id: str, role: str) -> str:
     private_key, _ = _load_keys()
@@ -55,7 +44,6 @@ def create_access_token(user_id: str, role: str) -> str:
         "jti":  str(uuid.uuid4()),
     }
     return jwt.encode(payload, private_key, algorithm=settings.JWT_ALGORITHM)
-
 
 def create_refresh_token(user_id: str) -> tuple[str, str]:
     """Returns (token_string, jti) — jti is stored in Redis for revocation."""
@@ -72,7 +60,6 @@ def create_refresh_token(user_id: str) -> tuple[str, str]:
     }
     token = jwt.encode(payload, private_key, algorithm=settings.JWT_ALGORITHM)
     return token, jti
-
 
 def decode_token(token: str) -> dict:
     """Decode and validate a JWT token. Raises JWTError on failure."""

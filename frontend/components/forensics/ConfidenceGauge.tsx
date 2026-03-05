@@ -2,7 +2,7 @@
 import React from "react";
 
 interface ConfidenceGaugeProps {
-  score: number; // 0 to 1
+  score: number;
   isTampered: boolean;
   size?: number;
 }

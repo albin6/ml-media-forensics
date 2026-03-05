@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
-
 class EvidenceResponse(BaseModel):
     id:          uuid.UUID
     filename:    str
@@ -16,7 +15,6 @@ class EvidenceResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
 
 class AnalysisResultResponse(BaseModel):
     id:                uuid.UUID
@@ -31,6 +29,5 @@ class AnalysisResultResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
 class AnalysisTriggerRequest(BaseModel):
-    model_version_tag: Optional[str] = None  # If None, uses active model
+    model_version_tag: Optional[str] = None

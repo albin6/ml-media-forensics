@@ -12,11 +12,9 @@ app = FastAPI(
     redoc_url=None,
 )
 
-
 @app.get("/health", include_in_schema=False)
 async def health():
     return {"status": "ok", "service": "ml-inference"}
-
 
 @app.post("/infer/image")
 async def infer_image(file: UploadFile = File(...)):
@@ -36,7 +34,6 @@ async def infer_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
 
-
 @app.post("/infer/video")
 async def infer_video(file: UploadFile = File(...)):
     """
@@ -54,7 +51,6 @@ async def infer_video(file: UploadFile = File(...)):
         return JSONResponse(content=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
-
 
 @app.get("/models/active")
 async def active_models():

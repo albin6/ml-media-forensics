@@ -8,7 +8,6 @@ from PIL import Image
 
 from preprocessing.ela import ela_to_tensor
 
-
 class CNNImageHandler:
     """
     Forensic image tampering detector using XceptionNet / ResNet backbone
@@ -26,8 +25,6 @@ class CNNImageHandler:
 
     def _build_model(self, arch: str) -> nn.Module:
         if arch == "xception":
-            # XceptionNet not in torchvision — use Inception-V3 as structural proxy
-            # Replace with: from pretrainedmodels import xception in production
             model = models.inception_v3(weights=None, num_classes=2, aux_logits=False)
         elif arch == "resnet50":
             model = models.resnet50(weights=None)
@@ -44,7 +41,6 @@ class CNNImageHandler:
             self.model.load_state_dict(state, strict=False)
 
     def infer(self, image_bytes: bytes) -> Dict[str, Any]:
-        # ELA preprocessing
         ela_pil, tensor = ela_to_tensor(image_bytes, size=(299, 299))
         tensor = tensor.to(self.device)
 
@@ -54,7 +50,6 @@ class CNNImageHandler:
             tampered_prob = probs[0, 1].item()
             is_tampered   = tampered_prob >= 0.5
 
-        # Encode ELA heatmap as base64 PNG
         buf = io.BytesIO()
         ela_pil.save(buf, format="PNG")
         ela_b64 = base64.b64encode(buf.getvalue()).decode()

@@ -2,7 +2,6 @@ import io
 import numpy as np
 from PIL import Image
 
-
 def compute_ela(image_bytes: bytes, quality: int = 95, amplifier: int = 20) -> Image.Image:
     """
     Error Level Analysis (ELA): detect regions with different compression levels.
@@ -22,24 +21,20 @@ def compute_ela(image_bytes: bytes, quality: int = 95, amplifier: int = 20) -> I
     """
     original = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-    # Re-save at fixed quality to a buffer
     recompressed_buffer = io.BytesIO()
     original.save(recompressed_buffer, format="JPEG", quality=quality)
     recompressed_buffer.seek(0)
     recompressed = Image.open(recompressed_buffer).convert("RGB")
 
-    # Ensure same size (handles tiny dimension mismatches after JPEG encoding)
     if original.size != recompressed.size:
         recompressed = recompressed.resize(original.size, Image.LANCZOS)
 
-    # Compute difference and amplify
     orig_array  = np.array(original,     dtype=np.int16)
     reco_array  = np.array(recompressed, dtype=np.int16)
     diff        = np.abs(orig_array - reco_array) * amplifier
     diff        = np.clip(diff, 0, 255).astype(np.uint8)
 
     return Image.fromarray(diff, mode="RGB")
-
 
 def ela_to_tensor(image_bytes: bytes, size: tuple = (299, 299)):
     """
@@ -59,5 +54,5 @@ def ela_to_tensor(image_bytes: bytes, size: tuple = (299, 299)):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     ])
-    tensor = transform(ela_pil).unsqueeze(0)  # (1, 3, H, W)
+    tensor = transform(ela_pil).unsqueeze(0)
     return ela_pil, tensor

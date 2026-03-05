@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
-
 class ModelVersion(Base):
     __tablename__ = "model_versions"
 
@@ -24,7 +23,6 @@ class ModelVersion(Base):
 
     analysis_results = relationship("AnalysisResult", back_populates="model_version")
 
-
 class AnalysisResult(Base):
     __tablename__ = "analysis_results"
 
@@ -35,8 +33,8 @@ class AnalysisResult(Base):
     is_tampered       = Column(Boolean)
     confidence_score  = Column(Float)
     processing_time_s = Column(Float)
-    ela_heatmap_key   = Column(String(512))   # MinIO object key
-    frame_results     = Column(JSONB)          # [{frame_no, is_tampered, confidence}]
+    ela_heatmap_key   = Column(String(512))
+    frame_results     = Column(JSONB)
     metadata          = Column(JSONB)
     created_at        = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 

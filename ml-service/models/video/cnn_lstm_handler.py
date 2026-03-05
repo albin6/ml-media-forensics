@@ -6,7 +6,6 @@ from typing import Dict, Any, List
 from preprocessing.ela import ela_to_tensor
 from preprocessing.frame_extractor import extract_frames
 
-
 class CNNLSTMVideoHandler:
     """
     Dual-stream CNN+LSTM detector for video tampering.
@@ -32,12 +31,10 @@ class CNNLSTMVideoHandler:
         self.classifier.eval()
 
     def _build_model(self):
-        # CNN feature extractor (ResNet-50 backbone, remove FC)
         cnn = models.resnet50(weights=None)
-        cnn.fc = nn.Identity()  # Output: (batch, 2048)
+        cnn.fc = nn.Identity()
         cnn = nn.Sequential(cnn, nn.Linear(2048, self.FEATURE_DIM))
 
-        # LSTM for temporal reasoning
         lstm = nn.LSTM(
             input_size=self.FEATURE_DIM,
             hidden_size=self.LSTM_HIDDEN,
@@ -46,7 +43,6 @@ class CNNLSTMVideoHandler:
             dropout=0.3,
         )
 
-        # Binary classifier: tampered / authentic
         classifier = nn.Sequential(
             nn.Linear(self.LSTM_HIDDEN, 64),
             nn.ReLU(),
@@ -76,31 +72,26 @@ class CNNLSTMVideoHandler:
         _, tensor = ela_to_tensor(frame_bytes, size=(224, 224))
         tensor = tensor.to(self.device)
         with torch.no_grad():
-            feat = self.cnn(tensor)  # (1, FEATURE_DIM)
-        return feat.squeeze(0)       # → (FEATURE_DIM,)
+            feat = self.cnn(tensor)
+        return feat.squeeze(0)
 
     def infer(self, video_bytes: bytes) -> Dict[str, Any]:
-        # 1. Extract sampled frames
         frames = extract_frames(video_bytes, sample_rate=5, max_frames=120)
         if not frames:
             return {"error": "No frames extracted from video"}
 
-        # 2. ELA + CNN per-frame feature extraction  →  list of (FEATURE_DIM,) tensors
         features = []
         for frame_no, frame_bytes in frames:
             feat = self._frame_to_feature(frame_bytes)
             features.append(feat)
 
-        # 3. Stack into sequence: (1, T, FEATURE_DIM) for LSTM batch_first
-        seq = torch.stack(features, dim=0).unsqueeze(0)  # (T, FEATURE_DIM) → (1, T, FEATURE_DIM)
+        seq = torch.stack(features, dim=0).unsqueeze(0)
 
-        # 4. LSTM temporal analysis
         with torch.no_grad():
-            lstm_out, _ = self.lstm(seq)             # (1, T, HIDDEN)
-            frame_logits = self.classifier(lstm_out)  # (1, T, 2)
-            frame_probs  = torch.softmax(frame_logits, dim=2)  # (1, T, 2)
+            lstm_out, _ = self.lstm(seq)
+            frame_logits = self.classifier(lstm_out)
+            frame_probs  = torch.softmax(frame_logits, dim=2)
 
-        # 5. Build per-frame results
         frame_results: List[Dict] = []
         for i, (frame_no, _) in enumerate(frames):
             conf = frame_probs[0, i, 1].item()
@@ -110,7 +101,6 @@ class CNNLSTMVideoHandler:
                 "confidence":  round(conf, 4),
             })
 
-        # 6. Overall video verdict: tampered if >25% of frames are flagged
         tampered_count = sum(1 for f in frame_results if f["is_tampered"])
         overall_conf   = frame_probs[0, :, 1].mean().item()
         is_tampered    = tampered_count / len(frame_results) > 0.25

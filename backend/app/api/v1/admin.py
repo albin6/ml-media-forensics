@@ -11,7 +11,6 @@ from app.schemas.auth import UserResponse
 
 router = APIRouter()
 
-
 @router.get("/users", response_model=list[UserResponse])
 async def list_users(
     db: AsyncSession = Depends(get_db),
@@ -21,7 +20,6 @@ async def list_users(
 ):
     result = await db.execute(select(User).offset(skip).limit(limit))
     return result.scalars().all()
-
 
 @router.patch("/users/{user_id}", response_model=UserResponse)
 async def update_user(
@@ -41,7 +39,6 @@ async def update_user(
     if is_active is not None:
         user.is_active = is_active
     return user
-
 
 @router.get("/audit-logs")
 async def get_audit_logs(
@@ -66,7 +63,6 @@ async def get_audit_logs(
         }
         for log in logs
     ]
-
 
 @router.get("/models", response_model=list[dict])
 async def list_models(

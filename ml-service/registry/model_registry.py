@@ -4,7 +4,6 @@ from pathlib import Path
 
 _MANIFEST_PATH = Path(__file__).parent.parent / "model_store" / "manifest.json"
 
-
 class ModelRegistry:
     """
     Loads and caches ML model handlers by name from the model manifest.
@@ -43,6 +42,5 @@ class ModelRegistry:
             self._cache[active] = CNNLSTMVideoHandler(model_path=model_path)
 
         return self._cache[active], active
-
 
 registry = ModelRegistry()

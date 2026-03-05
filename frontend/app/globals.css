@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* ── Color Palette ─────────────────────────────────────────────────────── */
+  
   --bg-base:        #0a0c12;
   --bg-surface:     #111420;
   --bg-card:        #161926;
@@ -19,7 +19,7 @@
   --text-secondary: #7b86a8;
   --text-muted:     #4b5270;
 
-  /* ── Spacing ────────────────────────────────────────────────────────────── */
+  
   --radius-sm:  6px;
   --radius-md:  10px;
   --radius-lg:  16px;
@@ -37,12 +37,10 @@ html, body {
   min-height:  100vh;
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-surface); }
 ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
 
-/* ── Utilities ───────────────────────────────────────────────────────────── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -120,7 +118,6 @@ label {
 
 .mono { font-family: 'JetBrains Mono', monospace; }
 
-/* ── Layout ──────────────────────────────────────────────────────────────── */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -134,20 +131,17 @@ label {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 
-/* ── Status Pills ─────────────────────────────────────────────────────────── */
 .status-pending    { color: var(--accent-warn);    background: #f9b34f15; }
 .status-processing { color: var(--accent-primary); background: #4f9cf915; }
 .status-completed  { color: var(--accent-success); background: #52d17c15; }
 .status-failed     { color: var(--accent-danger);  background: #f9707015; }
 
-/* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes fadeIn    { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes pulse-glow { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
 .animate-in { animation: fadeIn 0.3s ease forwards; }
 .pulsing    { animation: pulse-glow 1.5s ease infinite; }
 
-/* ── Drop Zone ────────────────────────────────────────────────────────────── */
 .dropzone {
   border: 2px dashed var(--border-bright);
   border-radius: var(--radius-xl);

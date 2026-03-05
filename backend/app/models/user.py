@@ -9,12 +9,10 @@ from sqlalchemy.dialects.postgresql import UUID, INET, JSONB
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
-
 class UserRole(str, enum.Enum):
     analyst = "analyst"
     admin   = "admin"
     viewer  = "viewer"
-
 
 class User(Base):
     __tablename__ = "users"

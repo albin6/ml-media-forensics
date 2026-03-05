@@ -9,11 +9,9 @@ from sqlalchemy.dialects.postgresql import UUID, INET
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
-
 class MediaType(str, enum.Enum):
     image = "image"
     video = "video"
-
 
 class EvidenceStatus(str, enum.Enum):
     pending    = "pending"
@@ -21,14 +19,13 @@ class EvidenceStatus(str, enum.Enum):
     completed  = "completed"
     failed     = "failed"
 
-
 class Evidence(Base):
     __tablename__ = "evidence"
 
     id          = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     uploaded_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    filename    = Column(String(255), nullable=False)          # Original filename
-    storage_key = Column(String(512), nullable=False, unique=True)  # UUID-based MinIO key
+    filename    = Column(String(255), nullable=False)
+    storage_key = Column(String(512), nullable=False, unique=True)
     file_size   = Column(BigInteger, nullable=False)
     mime_type   = Column(String(100), nullable=False)
     sha256_hash = Column(String(64), nullable=False, index=True)

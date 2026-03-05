@@ -72,7 +72,7 @@ export default function AdminDashboard() {
                 </p>
             </header>
 
-            {/* ── Tabs ── */}
+            
             <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", borderBottom: "1px solid var(--border)" }}>
                 <button
                     onClick={() => setTab("logs")}

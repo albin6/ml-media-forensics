@@ -4,7 +4,6 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 
-
 class RegisterRequest(BaseModel):
     email:     EmailStr
     password:  str
@@ -23,21 +22,17 @@ class RegisterRequest(BaseModel):
             raise ValueError("Password must contain a special character")
         return v
 
-
 class LoginRequest(BaseModel):
     email:    EmailStr
     password: str
 
-
 class RefreshRequest(BaseModel):
     refresh_token: str
-
 
 class TokenResponse(BaseModel):
     access_token:  str
     refresh_token: str
     token_type:    str = "bearer"
-
 
 class UserResponse(BaseModel):
     id:         UUID

@@ -16,7 +16,6 @@ app = FastAPI(
     redoc_url="/redoc" if settings.APP_ENV == "development" else None,
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -25,20 +24,15 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-# ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(auth.router,     prefix="/api/v1/auth",     tags=["Authentication"])
 app.include_router(evidence.router, prefix="/api/v1/evidence", tags=["Evidence"])
 app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["Analysis"])
 app.include_router(admin.router,    prefix="/api/v1/admin",    tags=["Admin"])
 
-
-# ── Health Check ──────────────────────────────────────────────────────────────
 @app.get("/health", include_in_schema=False)
 async def health():
     return {"status": "ok", "service": "forensics-backend"}
 
-
-# ── Global Exception Handler ──────────────────────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error("unhandled_exception", path=request.url.path, error=str(exc))
