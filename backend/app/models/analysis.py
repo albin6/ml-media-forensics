@@ -35,7 +35,7 @@ class AnalysisResult(Base):
     processing_time_s = Column(Float)
     ela_heatmap_key   = Column(String(512))
     frame_results     = Column(JSONB)
-    metadata          = Column(JSONB)
+    extra_metadata    = Column(JSONB)
     created_at        = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
     evidence      = relationship("Evidence",      back_populates="analysis_results")
