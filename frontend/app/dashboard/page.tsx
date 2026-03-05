@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { evidenceApi, analysisApi } from "@/lib/api";
-import { logout, isAuthenticated } from "@/lib/auth";
+import { logout, isAuthenticated, getUserRole } from "@/lib/auth";
 import {
     ShieldCheck, Upload, LogOut, FileImage, Film,
-    CheckCircle, XCircle, Clock, Activity, AlertTriangle
+    CheckCircle, XCircle, Clock, Activity, AlertTriangle, Shield
 } from "lucide-react";
 
 interface Evidence {
@@ -41,9 +41,11 @@ export default function DashboardPage() {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [dragActive, setDragActive] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated()) { router.push("/login"); return; }
+        setIsAdmin(getUserRole() === "admin");
         loadEvidence();
     }, []);
 
@@ -99,18 +101,21 @@ export default function DashboardPage() {
                 </div>
 
                 <nav style={{ flex: 1 }}>
-                    {[
-                        { icon: Activity, label: "Dashboard", href: "/dashboard" },
-                        { icon: Upload, label: "Upload", href: "/dashboard" },
-                    ].map(item => (
-                        <button key={item.label}
-                            className="btn btn-ghost"
-                            style={{ width: "100%", justifyContent: "flex-start", marginBottom: "0.25rem" }}
-                            onClick={() => router.push(item.href)}
-                        >
-                            <item.icon size={16} /> {item.label}
-                        </button>
-                    ))}
+                    {([
+                        { icon: Activity, label: "Dashboard", href: "/dashboard", adminOnly: false },
+                        { icon: Upload, label: "Upload", href: "/dashboard", adminOnly: false },
+                        { icon: Shield, label: "Admin", href: "/admin", adminOnly: true },
+                    ] as { icon: React.ElementType; label: string; href: string; adminOnly: boolean }[])
+                        .filter(item => !item.adminOnly || isAdmin)
+                        .map(item => (
+                            <button key={item.label}
+                                className="btn btn-ghost"
+                                style={{ width: "100%", justifyContent: "flex-start", marginBottom: "0.25rem" }}
+                                onClick={() => router.push(item.href)}
+                            >
+                                <item.icon size={16} /> {item.label}
+                            </button>
+                        ))}
                 </nav>
 
                 <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "flex-start" }}
